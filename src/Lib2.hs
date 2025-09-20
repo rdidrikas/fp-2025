@@ -1,3 +1,4 @@
+
 {-# LANGUAGE InstanceSigs #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Lib2(
@@ -16,7 +17,7 @@ parseCommand :: Parser Lib1.Command
 parseCommand _ = Left "Not implemented"
 
 process :: Lib1.Command -> [String]
-process (Lib1.Dump Lib1.Examples) = "Examples:" : map toCliCommand Lib1.examples
+--process (Lib1.Dump Lib1.Examples) = "Examples:" : map toCliCommand Lib1.examples
 process c = ["Parsed as " ++ show c]
 
 class ToCliCommand a where

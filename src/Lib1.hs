@@ -1,6 +1,7 @@
 module Lib1
     ( examples, Command(..), Dumpable(..)
     ) where
+--import Lib1 (Command)
 
 data Dumpable = Examples
   deriving Show
@@ -8,10 +9,40 @@ data Dumpable = Examples
 -- This is a "root" ADT representing your grammar,
 -- Please expand this ADT as needed
 
+data Food = Food String
+  deriving Show
+
+data Unit = Grams | Kilograms | Milliliters | Liters
+  deriving Show
+
+data MealType = Breakfast | Lunch | Dinner | Snack
+  deriving Show
+
+type Amount = Int
+type Calories = Int
+
+data Date = Date
+  { year  :: Int
+  , month :: Int
+  , day   :: Int
+  } deriving Show
+
+data MealBody = SingleAdd Food Amount Unit Calories MealType |
+  NestedAdd [MealBody]
+  deriving Show
+
+data Command =
+  Meal MealBody|
+  Add Food Amount Unit Calories MealType |
+  Remove Food Amount Unit Calories MealType |
+  Total Date 
+  deriving Show
+
+
 examples :: [Command]
 examples = [
-    "meal add tomato, 38g, 85 kcal to dinner, add tea, 7342ml, 5 kcal to dinner, meal add lettuce, 0kg, 4 kcal to dinner, add sandwich, 9kg, 94 kcal to dinner, add strawberry, 5ml, 4 kcal to lunch",
-    "meal add tomato, 56kg, 1 kcal to breakfast, add onion, 100g, 400 kcal to snack, add cucumber, 100g, 90 kcal to snack",
-    "goal compose 2025-08-28, 600, 2025-02-17, 3000, 2025-02-07, 1000",
-    "total 2014-06-23"
+    Add (Food "tomato") 38 Grams 85 Dinner,
+    Add (Food "tea") 7342 Milliliters 5 Dinner,
+    Meal (NestedAdd [SingleAdd (Food "tomato") 38 Grams 85 Dinner, SingleAdd (Food "tea") 7342 Milliliters 5 Dinner]),
+    Add (Food "lettuce") 0 Kilograms 4 Dinner
     ]
