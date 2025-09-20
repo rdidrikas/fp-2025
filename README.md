@@ -38,7 +38,7 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 ```haskell
 <command> ::= <meal> | <add> | <remove> | <total_calories> | <goal> | <display> | <dump_examples>
 
-<meal> ::= "meal " <meal_body>
+<meal> ::= "meal " <meal_body> ", " (<meal> | <add>)
 <meal_body> ::= (<add> | <meal_body>) ", " (<meal_body> | <add>)
 <add> ::= "add " <data> "to " <meal_type>
 <remove> ::= "remove " <data> "from " <meal_type>
@@ -68,15 +68,15 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
         | "29" | "30" | "31"
 
 <goal_option> ::= <set> | <show> | <set_composite_goal>
-<set> ::=  "set " <date> ", " <amount>
-<show> ::= "show " <date>
-<set_composite_goal> ::= "compose " <goal_list>
-<goal_list> ::= <single_goal> ", " (<goal_list> | <single_goal>)
-<single_goal> ::= <date> ", " <amount>
+<set> ::=  "set" <date> <amount>
+<show> ::= "show" <date>
+<set_composite_goal> ::= "compose" <goal_list>
+<goal_list> ::= <single_goal> "," (<goal_list> | <single_goal>)
+<single_goal> ::= <date> <amount>
 
 <digit> ::= [0-9]
 
-<display> ::= "display " <date>
+<display> ::= "display" <date>
 
 
 <dump_examples> ::= "dump examples"

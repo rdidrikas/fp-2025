@@ -10,11 +10,8 @@ data Dumpable = Examples
 
 examples :: [Command]
 examples = [
-    "meal add lettuce, 7g, 5 kcal to lunch, add sandwich, 87l, 6 kcal to dinner, 
-    add cucumber, 8ml, 7 kcal to dinner, 
-    add bread, 8kg, 8 kcal to breakfast, 
-    add pork, 85kg, 5 kcal to snack",
-    "meal add tomato, 056l, 1 kcal to breakfast, add onion, 4l, 4 kcal to snack",
+    "meal add tomato, 38g, 85 kcal to dinner, add tea, 7342ml, 5 kcal to dinner, meal add lettuce, 0kg, 4 kcal to dinner, add sandwich, 9kg, 94 kcal to dinner, add strawberry, 5ml, 4 kcal to lunch",
+    "meal add tomato, 56kg, 1 kcal to breakfast, add onion, 100g, 400 kcal to snack, add cucumber, 100g, 90 kcal to snack",
     "goal compose 2025-08-28, 600, 2025-02-17, 3000, 2025-02-07, 1000",
     "total 2014-06-23"
     ]
