@@ -26,8 +26,8 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
     - `Date`: A calendar date.
     - `Goal`: A calorie goal (daily or composite).
 - **Operations:**
-    - `add`: Add a food to a meal.
-    - `remove`: Remove a food from a meal.
+    - `add`: Add a food item to a meal.
+    - `remove`: Remove a food item from a meal.
     - `meal`: Define a recursive meal structure (can contain foods or other meals).     
     - `total`: Show total calories for a given date.
     - `goal`: Set, show, or define composite goals.
@@ -36,17 +36,16 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 ## BNF
 
 ```haskell
-<command> ::= <meal> | <add> | <remove> | <total_calories> | <goal> | <display> |<dump_examples>
+<command> ::= <meal> | <add> | <remove> | <total_calories> | <goal> | <display> | <dump_examples>
 
-<meal> ::= "meal" <meal-body>
-<meal-body> ::= <add> | <meal-body> "," <meal-body> | <meal>
-<add> ::= "add" <data> "to" <meal-type>
-<remove> ::= "remove" <data> "from" <meal-type>
-<total_calories> ::= "total" <date> 
-<current_calories> ::= "current"
-<goal> ::= "goal" <goal_option>
+<meal> ::= "meal " <meal_body>
+<meal_body> ::= (<add> | <meal_body>) ", " (<meal_body> | <add>)
+<add> ::= "add " <data> "to " <meal_type>
+<remove> ::= "remove " <data> "from " <meal_type>
+<total_calories> ::= "total " <date> 
+<goal> ::= "goal " <goal_option>
 
-<data> ::= <food> "," <amount> <unit> "," <calories>
+<data> ::= <food> ", " <amount> <unit> ", " <calories> " kcal "
 <food> ::= "apple" | "banana" | "chicken" | "rice" | "oats" 
          | "milk" | "egg" | "bread" | "salmon" | "potato"
          | "beef" | "pork" | "yogurt" | "cheese" | "butter"
@@ -57,9 +56,9 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 <amount> ::= <digit> | <digit> <amount>
 <unit> ::= "g" | "kg" | "ml" | "l"
 <calories> ::= <amount>
-<meal-type> ::= "breakfast" | "lunch" | "dinner" | "snack"
+<meal_type> ::= "breakfast" | "lunch" | "dinner" | "snack"
 
-<date> ::= <year> <month> <day>
+<date> ::= <year> "-" <month> "-" <day>
 <year> ::= <digit> <digit> <digit> <digit>
 <month> ::= "01" | "02" | "03" | "04" | "05" | "06"
            | "07" | "08" | "09" | "10" | "11" | "12"
@@ -68,15 +67,16 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
         | "20" | "21" | "22" | "23" | "24" | "25" | "26" | "27" | "28"
         | "29" | "30" | "31"
 
-<goal> ::= "goal" <goal_option>
 <goal_option> ::= <set> | <show> | <set_composite_goal>
-<set> ::=  "set" <date> <amount>
-<show> ::= "show" <date>
-<set_composite_goal ::= "compose" <goal_list>
-<goal_list> ::= <single_goal> "," <goal_list> | <single_goal>
-<single_goal> ::= <date> <amount>
+<set> ::=  "set " <date> ", " <amount>
+<show> ::= "show " <date>
+<set_composite_goal> ::= "compose " <goal_list>
+<goal_list> ::= <single_goal> ", " (<goal_list> | <single_goal>)
+<single_goal> ::= <date> ", " <amount>
 
-<display> ::= "display" <date>
+<digit> ::= [0-9]
+
+<display> ::= "display " <date>
 
 
 <dump_examples> ::= "dump examples"
