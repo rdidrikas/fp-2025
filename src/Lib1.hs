@@ -3,7 +3,7 @@ module Lib1
     ) where
 --import Lib1 (Command)
 
-data Dumpable = Examples
+data Dumpable = Examples 
   deriving Show
 
 -- This is a "root" ADT representing your grammar,
@@ -27,6 +27,14 @@ data Date = Date
   , day   :: Int
   } deriving Show
 
+data SingleGoal = Set Date Amount
+  deriving Show
+
+data GoalOption = SingleGoal SingleGoal | 
+  MultiGoal [SingleGoal] |
+  ShowGoal Date
+  deriving Show
+
 data MealBody = SingleAdd Food Amount Unit Calories MealType |
   NestedAdd [MealBody]
   deriving Show
@@ -35,14 +43,18 @@ data Command =
   Meal MealBody|
   Add Food Amount Unit Calories MealType |
   Remove Food Amount Unit Calories MealType |
-  Total Date 
+  Total Date |
+  Display Date |
+  Goal GoalOption
   deriving Show
 
 
 examples :: [Command]
 examples = [
-    Add (Food "tomato") 38 Grams 85 Dinner,
-    Add (Food "tea") 7342 Milliliters 5 Dinner,
+    Remove (Food "lettuce") 1 Kilograms 100 Lunch,
+    Add (Food "tea") 734 Milliliters 50 Dinner,
     Meal (NestedAdd [SingleAdd (Food "tomato") 38 Grams 85 Dinner, SingleAdd (Food "tea") 7342 Milliliters 5 Dinner]),
-    Add (Food "lettuce") 0 Kilograms 4 Dinner
+    Goal (MultiGoal[Set (Date { year = 2023, month = 3, day = 15 }) 2000, Set (Date 2023 3 16) 1500]),
+    Display (Date { year = 2023, month = 3, day = 15 }),
+    Total (Date{year = 2010,month = 09,day = 09})
     ]

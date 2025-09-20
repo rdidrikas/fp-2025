@@ -45,7 +45,7 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 <total_calories> ::= "total " <date> 
 <goal> ::= "goal " <goal_option>
 
-<data> ::= <food> ", " <amount> <unit> ", " <calories> " kcal "
+<data> ::= <food> ", " <amount> <unit> ", " <calories> " "
 <food> ::= "apple" | "banana" | "chicken" | "rice" | "oats" 
          | "milk" | "egg" | "bread" | "salmon" | "potato"
          | "beef" | "pork" | "yogurt" | "cheese" | "butter"
@@ -54,7 +54,7 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
          | "coffee" | "tea" | "water" | "juice" | "soda"
          | "pizza" | "pasta" | "burger" | "sandwich" | "soup"
 <amount> ::= <digit> | <digit> <amount>
-<unit> ::= "g" | "kg" | "ml" | "l"
+<unit> ::= "Grams" | "Kilograms" | "Mililiters" | "Liters"
 <calories> ::= <amount>
 <meal_type> ::= "breakfast" | "lunch" | "dinner" | "snack"
 
