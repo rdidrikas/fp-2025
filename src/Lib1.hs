@@ -40,12 +40,13 @@ data MealBody = SingleAdd Food Amount Unit Calories MealType |
   deriving Show
 
 data Command =
-  Meal MealBody|
+  Meal MealBody |
   Add Food Amount Unit Calories MealType |
   Remove Food Amount Unit Calories MealType |
   Total Date |
   Display Date |
-  Goal GoalOption
+  Goal GoalOption |
+  Dump Dumpable
   deriving Show
 
 
@@ -56,5 +57,6 @@ examples = [
     Meal (NestedAdd [SingleAdd (Food "tomato") 38 Grams 85 Dinner, SingleAdd (Food "tea") 7342 Milliliters 5 Dinner]),
     Goal (MultiGoal[Set (Date { year = 2023, month = 3, day = 15 }) 2000, Set (Date 2023 3 16) 1500]),
     Display (Date { year = 2023, month = 3, day = 15 }),
-    Total (Date{year = 2010,month = 09,day = 09})
+    Total (Date{year = 2010,month = 09,day = 09}),
+    Dump Examples
     ]

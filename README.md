@@ -35,7 +35,7 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 
 ## BNF
 
-```haskell
+```bnf
 <command> ::= <meal> | <add> | <remove> | <total_calories> | <goal> | <display> | <dump_examples>
 
 <meal> ::= "meal " <meal_body>
@@ -46,13 +46,7 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 <goal> ::= "goal " <goal_option>
 
 <data> ::= <food> ", " <amount> <unit> ", " <calories> " "
-<food> ::= "apple" | "banana" | "chicken" | "rice" | "oats" 
-         | "milk" | "egg" | "bread" | "salmon" | "potato"
-         | "beef" | "pork" | "yogurt" | "cheese" | "butter"
-         | "tomato" | "cucumber" | "lettuce" | "carrot" | "onion"
-         | "orange" | "pear" | "grapes" | "strawberry" | "blueberry"
-         | "coffee" | "tea" | "water" | "juice" | "soda"
-         | "pizza" | "pasta" | "burger" | "sandwich" | "soup"
+<food> ::= "apple" | "banana" | "chicken" | "rice" | "oats" | "milk" | "egg" | "bread" | "salmon" | "potato" | "beef" | "pork" | "yogurt" | "cheese" | "butter" | "tomato" | "cucumber" | "lettuce" | "carrot" | "onion" | "orange" | "pear" | "grapes" | "strawberry" | "blueberry"| "coffee" | "tea" | "water" | "juice" | "soda"| "pizza" | "pasta" | "burger" | "sandwich" | "soup"
 <amount> ::= <digit> | <digit> <amount>
 <unit> ::= "Grams" | "Kilograms" | "Mililiters" | "Liters"
 <calories> ::= <amount>
