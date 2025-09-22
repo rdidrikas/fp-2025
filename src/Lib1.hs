@@ -27,13 +27,6 @@ data Date = Date
   , day   :: Int
   } deriving Show
 
-data SingleGoal = Set Date Amount
-  deriving Show
-
-data GoalOption = SingleGoal SingleGoal | 
-  MultiGoal [SingleGoal] |
-  ShowGoal Date
-  deriving Show
 
 data MealBody = SingleAdd Food Amount Unit Calories MealType |
   NestedAdd [MealBody]
@@ -45,7 +38,6 @@ data Command =
   Remove Food Amount Unit Calories MealType |
   Total Date |
   Display Date |
-  Goal GoalOption |
   Dump Dumpable
   deriving Show
 
@@ -55,7 +47,6 @@ examples = [
     Remove (Food "lettuce") 1 Kilograms 100 Lunch,
     Add (Food "tea") 734 Milliliters 50 Dinner,
     Meal (NestedAdd [SingleAdd (Food "tomato") 38 Grams 85 Dinner, SingleAdd (Food "tea") 7342 Milliliters 5 Dinner]),
-    Goal (MultiGoal[Set (Date { year = 2023, month = 3, day = 15 }) 2000, Set (Date 2023 3 16) 1500]),
     Display (Date { year = 2023, month = 3, day = 15 }),
     Total (Date{year = 2010,month = 09,day = 09}),
     Dump Examples

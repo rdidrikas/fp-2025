@@ -34,7 +34,7 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 <goal> ::= "goal " <goal_option>
 
 <data> ::= <food> ", " <amount> <unit> ", " <calories> " "
-<food> ::= "apple" | "banana" | "chicken" | "rice" | "oats" | "milk" | "egg" | "bread" | "salmon" | "potato" | "beef" | "pork" | "yogurt" | "cheese" | "butter" | "tomato" | "cucumber" | "lettuce" | "carrot" | "onion" | "orange" | "pear" | "grapes" | "strawberry" | "blueberry"| "coffee" | "tea" | "water" | "juice" | "soda"| "pizza" | "pasta" | "burger" | "sandwich" | "soup"
+<food> ::= <string>
 <amount> ::= <digit> | <digit> <amount>
 <unit> ::= "Grams" | "Kilograms" | "Mililiters" | "Liters"
 <calories> ::= <amount>
@@ -56,6 +56,10 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 <goal_list> ::= <single_goal> "," (<goal_list> | <single_goal>)
 <single_goal> ::= <date> <amount>
 
+
+<string> ::= "" | <letter> <string>
+<letter> ::= "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z"
+
 <digit> ::= [0-9]
 
 <display> ::= "display" <date>
@@ -65,7 +69,7 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 ```
 
 ## Examples
-```Haskell
+```
     Remove (Food "lettuce") 1 Kilograms 100 Lunch,
     Add (Food "tea") 734 Milliliters 50 Dinner,
     Meal (NestedAdd [SingleAdd (Food "tomato") 38 Grams 85 Dinner, SingleAdd (Food "tea") 7342 Milliliters 5 Dinner]),
