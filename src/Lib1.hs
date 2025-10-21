@@ -1,5 +1,5 @@
 module Lib1
-    ( examples, Command(..), Dumpable(..), Date(..)
+    ( examples, Command(..), Dumpable(..), Date(..), Unit(..), MealType(..), Food(..)
     ) where
 --import Lib1 (Command)
 
@@ -47,7 +47,7 @@ examples = [
     Remove (Food "lettuce") 1 Kilograms 100 Lunch,
     Add (Food "tea") 734 Milliliters 50 Dinner,
     Meal (CombineAdd (SingleAdd (Food "tomato") 38 Grams 85 Dinner) (SingleAdd (Food "tea") 7342 Milliliters 5 Dinner)),
-    Display (Date { year = 2023, month = 3, day = 15 }),
-    Total (Date{year = 2010,month = 09,day = 09}),
+    Display (Date 2010 10 10),
+    Total (Date 2010 10 10),
     Dump Examples
     ]

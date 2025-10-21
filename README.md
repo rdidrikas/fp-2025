@@ -26,14 +26,14 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 
 <meal> ::= "meal " <meal_body>
 <meal_body> ::= <add> | <meal_body> ", " <meal_body>
-<add> ::= "add " <data> "to " <meal_type>
+<add> ::= "add " <data> " to " <meal_type>
 <remove> ::= "remove " <data> "from " <meal_type>
 <total_calories> ::= "total " <date> 
 
-<data> ::= <food> ", " <amount> <unit> ", " <calories> " "
+<data> ::= <food> ", " <amount> <unit> ", " <calories>
 <food> ::= <string>
 <amount> ::= <digit> | <digit> <amount>
-<unit> ::= "Grams" | "Kilograms" | "Mililiters" | "Liters"
+<unit> ::= "Grams" | "Kilograms" | "Milliliters" | "Liters"
 <calories> ::= <amount>
 <meal_type> ::= "breakfast" | "lunch" | "dinner" | "snack"
 
@@ -56,7 +56,7 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 ## Examples
 ```
     Remove (Food "lettuce") 1 Kilograms 100 Lunch,
-    Add (Food "tea") 734 Milliliters 50 Dinner,
+    Add (Food "tea") 734 Millliliters 50 Dinner,
     Meal (CombineAdd (SingleAdd (Food "tomato") 38 Grams 85 Dinner) (SingleAdd (Food "tea") 7342 Milliliters 5 Dinner)),
     Goal (MultiGoal[Set (Date { year = 2023, month = 3, day = 15 }) 2000, Set (Date 2023 3 16) 1500]),
     Display (Date { year = 2023, month = 3, day = 15 }),
