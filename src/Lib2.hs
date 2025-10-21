@@ -195,8 +195,9 @@ parseAdd input =
       (parseKeyword " to ")
       parseMealType input of
         Left err -> Left err
-        Right ((_, (food, amount, unit, calories), _, mealType), rest) -> 
-          Right (Lib1.Add food amount unit calories mealType, rest)
+        Right ((_, foodData, _, mealType), rest) -> 
+          let (food, amount, unit, calories) = foodData
+          in Right (Lib1.Add food amount unit calories mealType, rest)
 
 -- ==================== TYPE CLASS INSTANCES ====================
 
@@ -213,7 +214,8 @@ instance ToCliCommand Lib1.Command where
   toCliCommand (Lib1.Dump Lib1.Examples) = "dump examples"
   toCliCommand (Lib1.Display date) = "display " ++ show date
   toCliCommand (Lib1.Total date) = "total " ++ show date
-  toCliCommand (Lib1.Add food amount unit calories mealType) = "add " ++ show food ++ ", " ++ show amount ++ " " ++ toCliCommand unit ++ ", " ++ show calories ++ " to " ++ toCliCommand mealType
+  toCliCommand (Lib1.Add food amount unit calories mealType) = "add " ++ show food ++ ", " ++ show amount ++ " " ++ toCliCommand unit ++ ", " 
+    ++ show calories ++ " to " ++ toCliCommand mealType
   toCliCommand cmd = "Example: " ++ show cmd
 
 instance Eq Lib1.Command where
