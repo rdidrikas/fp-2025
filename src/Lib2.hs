@@ -11,27 +11,49 @@ import qualified Lib1
 type ErrorMsg = String
 type Parser a = String -> Either ErrorMsg (a, String)
 
--- | Parses user's input.
--- The function must be implemented and must have tests.
-parseCommand :: Parser Lib1.Command
-parseCommand _ = Left "Not implemented"
+
+-- ==================== BASIC PARSER HELPERS ====================
+
+-- Helper to parse a specific string
+parseString :: String -> Parser String
+parseString expected = \input ->
+  if expected `isPrefixOf` input
+    then Right (expected, drop (length expected) input)
+    else Left $ "Expected '" ++ expected ++ "'"
+
+-- Helper to check if a string starts with another string
+isPrefixOf :: String -> String -> Bool
+isPrefixOf prefix str = prefix == take (length prefix) str
+
+-- ==================== MAIN PARSER ====================
+
+-- | Parses user's input
+parseCommand :: Parser Lib1.Command -- returns either
+parseCommand input = parseDumpExamples input
+
+-- <dump_examples> ::= "dump examples"
+parseDumpExamples :: Parser Lib1.Command
+parseDumpExamples input =
+  case parseString "dump examples" input of
+    Left err -> Left err -- if parsing failed this calls
+    Right (_, rest) -> Right (Lib1.Dump Lib1.Examples, rest)
+
+-- ==================== TYPE CLASS INSTANCES ====================
 
 process :: Lib1.Command -> [String]
---process (Lib1.Dump Lib1.Examples) = "Examples:" : map toCliCommand Lib1.examples
-process c = ["Parsed as " ++ show c]
+process (Lib1.Dump Lib1.Examples) = 
+  "Examples:" : map toCliCommand Lib1.examples
+process c = ["Parsed as: " ++ show c]
 
 class ToCliCommand a where
   toCliCommand :: a -> String
 
--- | You have to make your Command an instance of ToCliCommand class.
--- Please remove all custom Show instances of Command ADT and
--- use "deriving Show" only.
 instance ToCliCommand Lib1.Command where
   toCliCommand :: Lib1.Command -> String
-  toCliCommand _ = "Not implemented"
+  toCliCommand (Lib1.Dump Lib1.Examples) = "dump examples"
+  toCliCommand cmd = "Example: " ++ show cmd
 
--- | You have to make your Command an instance of Eq class.
--- Usage of "deriving Eq" is forbidden.
 instance Eq Lib1.Command where
   (==) :: Lib1.Command -> Lib1.Command -> Bool
+  Lib1.Dump Lib1.Examples == Lib1.Dump Lib1.Examples = True
   _ == _ = False
