@@ -29,7 +29,7 @@ data Date = Date
 
 
 data MealBody = SingleAdd Food Amount Unit Calories MealType |
-  NestedAdd [MealBody]
+  CombineAdd MealBody MealBody
   deriving Show
 
 data Command =
@@ -46,7 +46,7 @@ examples :: [Command]
 examples = [
     Remove (Food "lettuce") 1 Kilograms 100 Lunch,
     Add (Food "tea") 734 Milliliters 50 Dinner,
-    Meal (NestedAdd [SingleAdd (Food "tomato") 38 Grams 85 Dinner, SingleAdd (Food "tea") 7342 Milliliters 5 Dinner]),
+    Meal (CombineAdd (SingleAdd (Food "tomato") 38 Grams 85 Dinner) (SingleAdd (Food "tea") 7342 Milliliters 5 Dinner)),
     Display (Date { year = 2023, month = 3, day = 15 }),
     Total (Date{year = 2010,month = 09,day = 09}),
     Dump Examples
