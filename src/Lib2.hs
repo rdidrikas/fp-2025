@@ -7,36 +7,127 @@ module Lib2(
     , process) where
 
 import qualified Lib1
+import Data.Char (isDigit, isSpace, isAlpha)
 
 type ErrorMsg = String
 type Parser a = String -> Either ErrorMsg (a, String)
 
 
+-- ==================== PARSER COMBINATORS ====================
+
+orElse :: Parser a -> Parser a -> Parser a
+orElse p1 p2 input
+  = case p1 input of
+      Right result -> Right result
+      Left _ -> p2 input
+
+and2 :: Parser a -> Parser b -> Parser (a, b)
+and2 p1 p2 input
+  = case p1 input of
+      Left err -> Left err
+      Right (a, rest1)
+        -> case p2 rest1 of
+             Left err -> Left err
+             Right (b, rest2) -> Right ((a, b), rest2)
+
+and3 :: Parser a -> Parser b -> Parser c -> Parser (a, b, c)
+and3 p1 p2 p3 input
+  = case and2 p1 p2 input of
+      Left err -> Left err
+      Right ((a, b), rest)
+        -> case p3 rest of
+             Left err -> Left err
+             Right (c, rest2) -> Right ((a, b, c), rest2)
+
+and4 :: Parser a -> Parser b -> Parser c -> Parser d -> Parser (a, b, c, d)
+and4 p1 p2 p3 p4 input =
+  case and3 p1 p2 p3 input of
+    Left err -> Left err
+    Right ((a, b, c), rest) ->
+      case p4 rest of
+        Left err -> Left err
+        Right (d, rest2) -> Right ((a, b, c, d), rest2)
+
+and5 :: Parser a -> Parser b -> Parser c -> Parser d -> Parser e -> Parser (a, b, c, d, e)
+and5 p1 p2 p3 p4 p5 input =
+  case and4 p1 p2 p3 p4 input of
+    Left err -> Left err
+    Right ((a, b, c, d), rest) ->
+      case p5 rest of
+        Left err -> Left err
+        Right (e, rest2) -> Right ((a, b, c, d, e), rest2)
+
 -- ==================== BASIC PARSER HELPERS ====================
 
 -- Helper to parse a specific string
-parseString :: String -> Parser String
-parseString expected = \input ->
-  if expected `isPrefixOf` input
-    then Right (expected, drop (length expected) input)
-    else Left $ "Expected '" ++ expected ++ "'"
+parseWord :: Parser String
+parseWord input =
+  let (word, rest) = span isAlpha input
+  in if null word
+     then Left "Expected word"
+     else Right (word, rest)
 
 -- Helper to check if a string starts with another string
 isPrefixOf :: String -> String -> Bool
 isPrefixOf prefix str = prefix == take (length prefix) str
 
+-- Parse number with n
+parseNumber :: Parser Int
+parseNumber input =
+  let (digits, rest) = span isDigit input
+  in if null digits 
+     then Left "Expected number"
+     else Right (read digits, rest)
+
+-- <date> ::= <year> " " <month> " " <day>
+parseDate :: Parser Lib1.Date
+parseDate input =
+  case and5 parseNumber parseWhitespace parseNumber parseWhitespace parseNumber input of
+    Left err -> Left err
+    Right ((year, _, month, _, day), rest) ->  -- remove whitespace results
+      Right (Lib1.Date year month day, rest)
+
+-- Parse whitespace
+parseWhitespace :: Parser String
+parseWhitespace input
+  = case span isSpace input of
+      ("", _) -> Left "Expected whitespace"
+      (spaces, rest) -> Right (spaces, rest)
+
+-- For command parsing
+parseKeyword :: String -> Parser String
+parseKeyword expected input
+  = if expected `isPrefixOf` input then
+        Right (expected, drop (length expected) input)
+    else
+        Left $ "Expected '" ++ expected ++ "'"
+
 -- ==================== MAIN PARSER ====================
 
 -- | Parses user's input
-parseCommand :: Parser Lib1.Command -- returns either
-parseCommand input = parseDumpExamples input
+parseCommand :: Parser Lib1.Command
+parseCommand = parseDumpExamples `orElse` parseDisplay
+
+-- ==================== COMMAND PARSERS ====================
 
 -- <dump_examples> ::= "dump examples"
 parseDumpExamples :: Parser Lib1.Command
 parseDumpExamples input =
-  case parseString "dump examples" input of
+  case parseKeyword "dump examples" input of
     Left err -> Left err -- if parsing failed this calls
     Right (_, rest) -> Right (Lib1.Dump Lib1.Examples, rest)
+
+parseDisplay :: Parser Lib1.Command
+parseDisplay input =
+  case parseKeyword "display" input of
+    Left err -> Left err
+    Right (_, rest) -> 
+      case parseWhitespace rest of
+        Left err -> Left err
+        Right (_, rest2) ->
+          case parseDate rest2 of
+            Left err -> Left err
+            Right (date, rest3) -> Right (Lib1.Display date, rest3)
 
 -- ==================== TYPE CLASS INSTANCES ====================
 
@@ -51,9 +142,18 @@ class ToCliCommand a where
 instance ToCliCommand Lib1.Command where
   toCliCommand :: Lib1.Command -> String
   toCliCommand (Lib1.Dump Lib1.Examples) = "dump examples"
+  toCliCommand (Lib1.Display date) = "display " ++ show date
   toCliCommand cmd = "Example: " ++ show cmd
 
 instance Eq Lib1.Command where
   (==) :: Lib1.Command -> Lib1.Command -> Bool
   Lib1.Dump Lib1.Examples == Lib1.Dump Lib1.Examples = True
-  _ == _ = False
+  -- Lib1.Display date1 == Lib1.Display date2 = date1 == date2 -- probably will need later
+  _ == _ = False -- everything else is not equal
+
+{- Also may need later
+instance Eq Lib1.Date where
+  (==) :: Lib1.Date -> Lib1.Date -> Bool
+  Lib1.Date y1 m1 d1 == Lib1.Date y2 m2 d2 = 
+    y1 == y2 && m1 == m2 && d1 == d2    
+-}

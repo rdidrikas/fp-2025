@@ -1,5 +1,5 @@
 module Lib1
-    ( examples, Command(..), Dumpable(..)
+    ( examples, Command(..), Dumpable(..), Date(..)
     ) where
 --import Lib1 (Command)
 
