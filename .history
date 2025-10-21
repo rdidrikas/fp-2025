@@ -1,3 +1,6 @@
+:q
+display 2010 10 10
+display 2025 20 20
 dump examples
 display 2025 10 10
 display 2025 10 1

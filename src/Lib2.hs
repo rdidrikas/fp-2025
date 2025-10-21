@@ -119,16 +119,13 @@ parseDumpExamples input =
 
 parseDisplay :: Parser Lib1.Command
 parseDisplay input =
-  case parseKeyword "display" input of
+  case parseKeyword "display" input of -- not using and 3 for readability (in my opinion looks better)
     Left err -> Left err
-    Right (_, rest) -> 
-      case parseWhitespace rest of
+    Right (_, rest) ->
+      case and2 parseWhitespace parseDate rest of
         Left err -> Left err
-        Right (_, rest2) ->
-          case parseDate rest2 of
-            Left err -> Left err
-            Right (date, rest3) -> Right (Lib1.Display date, rest3)
-
+        Right ((_, date), rest2) -> Right (Lib1.Display date, rest2)
+  
 -- ==================== TYPE CLASS INSTANCES ====================
 
 process :: Lib1.Command -> [String]
