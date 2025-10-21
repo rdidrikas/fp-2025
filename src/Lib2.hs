@@ -106,7 +106,9 @@ parseKeyword expected input
 
 -- | Parses user's input
 parseCommand :: Parser Lib1.Command
-parseCommand = parseDumpExamples `orElse` parseDisplay
+parseCommand = parseDumpExamples 
+  `orElse` parseDisplay
+  `orElse` parseTotal
 
 -- ==================== COMMAND PARSERS ====================
 
@@ -125,6 +127,15 @@ parseDisplay input =
       case and2 parseWhitespace parseDate rest of
         Left err -> Left err
         Right ((_, date), rest2) -> Right (Lib1.Display date, rest2)
+
+parseTotal :: Parser Lib1.Command
+parseTotal input =
+  case parseKeyword "total" input of
+    Left err -> Left err
+    Right (_, rest) -> 
+      case and2 parseWhitespace parseDate rest of
+        Left err -> Left err
+        Right ((_, date), rest2) -> Right (Lib1.Total date, rest2)
   
 -- ==================== TYPE CLASS INSTANCES ====================
 
@@ -140,6 +151,7 @@ instance ToCliCommand Lib1.Command where
   toCliCommand :: Lib1.Command -> String
   toCliCommand (Lib1.Dump Lib1.Examples) = "dump examples"
   toCliCommand (Lib1.Display date) = "display " ++ show date
+  toCliCommand (Lib1.Total date) = "total " ++ show date
   toCliCommand cmd = "Example: " ++ show cmd
 
 instance Eq Lib1.Command where
