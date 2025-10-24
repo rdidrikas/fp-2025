@@ -23,6 +23,7 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 
 ```bnf
 <command> ::= <meal> | <add> | <remove> | <total_calories> | <display> | <dump_examples>
+<command> ::= <meal> | <add> | <remove> | <total_calories> | <display> | <dump_examples>
 
 <meal> ::= "meal " <meal_body>
 <meal_body> ::= <add> | <meal_body> ", " <meal_body>
