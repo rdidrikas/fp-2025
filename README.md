@@ -23,7 +23,6 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 
 ```bnf
 <command> ::= <meal> | <add> | <remove> | <total_calories> | <display> | <dump_examples>
-<command> ::= <meal> | <add> | <remove> | <total_calories> | <display> | <dump_examples>
 
 <meal> ::= "meal " <meal_body>
 <meal_body> ::= <add> | <meal_body> ", " <meal_body>
@@ -50,7 +49,6 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 
 <display> ::= "display " <date>
 
-
 <dump_examples> ::= "dump examples"
 ```
 
@@ -59,7 +57,6 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
     Remove (Food "lettuce") 1 Kilograms 100 Lunch,
     Add (Food "tea") 734 Millliliters 50 Dinner,
     Meal (CombineAdd (SingleAdd (Food "tomato") 38 Grams 85 Dinner) (SingleAdd (Food "tea") 7342 Milliliters 5 Dinner)),
-    Goal (MultiGoal[Set (Date { year = 2023, month = 3, day = 15 }) 2000, Set (Date 2023 3 16) 1500]),
-    Display (Date { year = 2023, month = 3, day = 15 }),
-    Total (Date{year = 2010,month = 09,day = 09})
+    Display (Date 2010 10 10),
+    Total (Date 2010 10 10)
 ```
