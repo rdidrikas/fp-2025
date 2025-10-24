@@ -145,7 +145,7 @@ parseWord input =
 isPrefixOf :: String -> String -> Bool
 isPrefixOf prefix str = prefix == take (length prefix) str
 
--- Parse number with n
+-- Parse number
 parseNumber :: Parser Int
 parseNumber input =
   let (digits, rest) = span isDigit input
