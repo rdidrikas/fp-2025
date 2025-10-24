@@ -3,7 +3,7 @@ import Test.Tasty ( TestTree, defaultMain, testGroup )
 import Test.Tasty.HUnit ( testCase, (@?=) )
 
 import Lib1 qualified
---import Lib2 qualified
+import Lib2 qualified
 
 main :: IO ()
 main = defaultMain tests
@@ -23,4 +23,3 @@ lib2Tests = testGroup "Lib2 tests" (
     Lib2.parseCommand (Lib2.toCliCommand e) @?= Right (e, "")
   ) Lib1.examples)
 
--- removed the tests because I dont know if they should be included for lib 1

@@ -1,4 +1,3 @@
-
 {-# LANGUAGE InstanceSigs #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 module Lib2(
@@ -74,7 +73,7 @@ parseUnit input =
     Right (_, rest) -> Right (Lib1.Grams, rest)
     Left _ -> case parseKeyword "Kilograms" input of
       Right (_, rest) -> Right (Lib1.Kilograms, rest)
-      Left _ -> case parseKeyword "Mililiters" input of
+      Left _ -> case parseKeyword "Milliliters" input of
         Right (_, rest) -> Right (Lib1.Milliliters, rest)
         Left _ -> case parseKeyword "Liters" input of
           Right (_, rest) -> Right (Lib1.Liters, rest)
@@ -259,21 +258,27 @@ class ToCliCommand a where
 instance ToCliCommand Lib1.Command where
   toCliCommand :: Lib1.Command -> String
   toCliCommand (Lib1.Dump Lib1.Examples) = "dump examples"
-  toCliCommand (Lib1.Display date) = "display " ++ show date
-  toCliCommand (Lib1.Total date) = "total " ++ show date
-  toCliCommand (Lib1.Add food amount unit calories mealType) = "add " ++ show food ++ ", " ++ show amount ++ " " ++ toCliCommand unit ++ ", " 
+  toCliCommand (Lib1.Display date) = 
+    "display " ++ show (Lib1.year date) ++ " " ++ show (Lib1.month date) ++ " " ++ show (Lib1.day date)
+  toCliCommand (Lib1.Total date) = 
+    "total " ++ show (Lib1.year date) ++ " " ++ show (Lib1.month date) ++ " " ++ show (Lib1.day date)
+  toCliCommand (Lib1.Add food amount unit calories mealType) = "add " ++ toCliCommand food ++ ", " ++ show amount ++ " " ++ toCliCommand unit ++ ", " 
     ++ show calories ++ " to " ++ toCliCommand mealType
-  toCliCommand (Lib1.Remove food amount unit calories mealType) = "remove " ++ show food ++ ", " ++ show amount ++ " " ++ toCliCommand unit ++ ", " 
-    ++ show calories ++ " to " ++ toCliCommand mealType
+  toCliCommand (Lib1.Remove food amount unit calories mealType) = 
+    "remove " ++ toCliCommand food ++ ", " ++ show amount ++ " " ++ toCliCommand unit ++ ", " ++ show calories ++ " from " ++ toCliCommand mealType
   toCliCommand (Lib1.Meal mealBody) = "meal " ++ toCliCommand mealBody
-  toCliCommand cmd = "Example: " ++ show cmd
 
 instance ToCliCommand Lib1.MealBody where
+  toCliCommand :: MealBody -> String
   toCliCommand (Lib1.SingleAdd food amount unit calories mealType) =
     toCliCommand (Lib1.Add food amount unit calories mealType)
   
   toCliCommand (Lib1.CombineAdd first second) =
-    toCliCommand first ++ ", " ++ toCliCommand second 
+    toCliCommand first ++ ", " ++ toCliCommand second
+
+instance ToCliCommand Lib1.Food where
+  toCliCommand :: Lib1.Food -> String
+  toCliCommand (Lib1.Food name) = name
 
 instance Eq Lib1.Command where
   (==) :: Lib1.Command -> Lib1.Command -> Bool
@@ -307,7 +312,7 @@ instance Eq Lib1.Date where
 instance ToCliCommand Lib1.Unit where
   toCliCommand Lib1.Grams = "Grams"
   toCliCommand Lib1.Kilograms = "Kilograms"
-  toCliCommand Lib1.Milliliters = "Mililiters"
+  toCliCommand Lib1.Milliliters = "Milliliters"
   toCliCommand Lib1.Liters = "Liters"
 
 instance ToCliCommand Lib1.MealType where
