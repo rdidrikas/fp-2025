@@ -27,7 +27,7 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
 <meal> ::= "meal " <meal_body>
 <meal_body> ::= <add> | <meal_body> ", " <meal_body>
 <add> ::= "add " <data> " to " <meal_type>
-<remove> ::= "remove " <data> "from " <meal_type>
+<remove> ::= "remove " <data> " from " <meal_type>
 <total_calories> ::= "total " <date> 
 
 <data> ::= <food> ", " <amount> <unit> ", " <calories>

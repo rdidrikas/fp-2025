@@ -160,6 +160,7 @@ parseCommand = parseDumpExamples
   `orElse` parseDisplay
   `orElse` parseTotal
   `orElse` parseAdd
+  `orElse` parseRemove
 
 -- ==================== COMMAND PARSERS ====================
 
@@ -190,14 +191,25 @@ parseTotal input =
   
 parseAdd :: Parser Lib1.Command
 parseAdd input =
-    case and4 (parseKeyword "add")
-      (parseWhitespace `andThen` parseFoodData)
-      (parseKeyword " to ")
-      parseMealType input of
-        Left err -> Left err
-        Right ((_, foodData, _, mealType), rest) -> 
-          let (food, amount, unit, calories) = foodData
-          in Right (Lib1.Add food amount unit calories mealType, rest)
+  case and4 (parseKeyword "add")
+    (parseWhitespace `andThen` parseFoodData)
+    (parseKeyword " to ")
+    parseMealType input of
+      Left err -> Left err
+      Right ((_, foodData, _, mealType), rest) -> 
+        let (food, amount, unit, calories) = foodData
+        in Right (Lib1.Add food amount unit calories mealType, rest)
+
+parseRemove :: Parser Lib1.Command
+parseRemove input = 
+  case and4 (parseKeyword "remove")
+    (parseWhitespace `andThen` parseFoodData)
+    (parseKeyword " from ")
+    parseMealType input of
+      Left err -> Left err
+      Right ((_, foodData, _, mealType), rest) ->
+        let (food, amount, unit, calories) = foodData
+        in Right (Lib1.Remove food amount unit calories mealType, rest)
 
 -- ==================== TYPE CLASS INSTANCES ====================
 
@@ -215,6 +227,8 @@ instance ToCliCommand Lib1.Command where
   toCliCommand (Lib1.Display date) = "display " ++ show date
   toCliCommand (Lib1.Total date) = "total " ++ show date
   toCliCommand (Lib1.Add food amount unit calories mealType) = "add " ++ show food ++ ", " ++ show amount ++ " " ++ toCliCommand unit ++ ", " 
+    ++ show calories ++ " to " ++ toCliCommand mealType
+  toCliCommand (Lib1.Remove food amount unit calories mealType) = "remove " ++ show food ++ ", " ++ show amount ++ " " ++ toCliCommand unit ++ ", " 
     ++ show calories ++ " to " ++ toCliCommand mealType
   toCliCommand cmd = "Example: " ++ show cmd
 
