@@ -47,7 +47,7 @@ This DSL is designed for simple calorie tracking and meal management. You can ad
         | "29" | "30" | "31"
 <digit> ::= [0-9]
 
-<display> ::= "display" <date>
+<display> ::= "display " <date>
 
 
 <dump_examples> ::= "dump examples"

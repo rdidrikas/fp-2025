@@ -8,6 +8,7 @@ module Lib2(
 
 import qualified Lib1
 import Data.Char (isDigit, isSpace, isAlpha)
+import Lib1 (MealBody(CombineAdd))
 
 type ErrorMsg = String
 type Parser a = String -> Either ErrorMsg (a, String)
@@ -111,6 +112,26 @@ parseDate input =
     Right ((year, _, month, _, day), rest) ->  -- remove whitespace results
       Right (Lib1.Date year month day, rest)
 
+-- <meal_body> ::= <add> | <meal_body> ", " <meal_body>
+parseMealBody :: Parser Lib1.MealBody
+parseMealBody input = 
+  case singleAdd input of
+  Left err -> Left err
+  Right (first, rest) -> -- keeps parsing if there is more
+    case parseKeyword ", " rest of
+      Left _ -> Right (first, rest)  -- if no more, return single add
+      Right (_, rest2) ->            -- if more, parse continues
+        case parseMealBody rest2 of  -- recursion
+          Left err -> Left err
+          Right (second, rest3) -> Right (Lib1.CombineAdd first second, rest3)
+  where
+    singleAdd input =
+      case parseAdd input of
+          Left err -> Left err
+          Right (Lib1.Add food amount unit calories mealType, rest) ->
+            Right (Lib1.SingleAdd food amount unit calories mealType, rest)
+          Right (_, rest) -> Left "Expected add command"
+
 -- ==================== BASIC PARSER HELPERS ====================
 
 -- Helper to parse a specific string
@@ -161,6 +182,7 @@ parseCommand = parseDumpExamples
   `orElse` parseTotal
   `orElse` parseAdd
   `orElse` parseRemove
+  `orElse` parseMeal
 
 -- ==================== COMMAND PARSERS ====================
 
@@ -171,6 +193,7 @@ parseDumpExamples input =
     Left err -> Left err -- if parsing failed this calls
     Right (_, rest) -> Right (Lib1.Dump Lib1.Examples, rest)
 
+-- <display> ::= "display " <date>
 parseDisplay :: Parser Lib1.Command
 parseDisplay input =
   case parseKeyword "display" input of -- not using and 3 for readability (in my opinion looks better)
@@ -180,6 +203,7 @@ parseDisplay input =
         Left err -> Left err
         Right ((_, date), rest2) -> Right (Lib1.Display date, rest2)
 
+-- <total_calories> ::= "total " <date> 
 parseTotal :: Parser Lib1.Command
 parseTotal input =
   case parseKeyword "total" input of
@@ -188,7 +212,8 @@ parseTotal input =
       case and2 parseWhitespace parseDate rest of
         Left err -> Left err
         Right ((_, date), rest2) -> Right (Lib1.Total date, rest2)
-  
+
+-- <add> ::= "add " <data> " to " <meal_type>
 parseAdd :: Parser Lib1.Command
 parseAdd input =
   case and4 (parseKeyword "add")
@@ -200,6 +225,7 @@ parseAdd input =
         let (food, amount, unit, calories) = foodData
         in Right (Lib1.Add food amount unit calories mealType, rest)
 
+-- <remove> ::= "remove " <data> " from " <meal_type>
 parseRemove :: Parser Lib1.Command
 parseRemove input = 
   case and4 (parseKeyword "remove")
@@ -210,6 +236,15 @@ parseRemove input =
       Right ((_, foodData, _, mealType), rest) ->
         let (food, amount, unit, calories) = foodData
         in Right (Lib1.Remove food amount unit calories mealType, rest)
+
+-- <meal> ::= "meal " <meal_body>
+parseMeal :: Parser Lib1.Command
+parseMeal input = 
+  case and3 (parseKeyword "meal")
+    parseWhitespace
+    parseMealBody input of
+      Left err -> Left err
+      Right ((_, _, mealBody), rest) -> Right (Lib1.Meal mealBody, rest)
 
 -- ==================== TYPE CLASS INSTANCES ====================
 
@@ -230,20 +265,44 @@ instance ToCliCommand Lib1.Command where
     ++ show calories ++ " to " ++ toCliCommand mealType
   toCliCommand (Lib1.Remove food amount unit calories mealType) = "remove " ++ show food ++ ", " ++ show amount ++ " " ++ toCliCommand unit ++ ", " 
     ++ show calories ++ " to " ++ toCliCommand mealType
+  toCliCommand (Lib1.Meal mealBody) = "meal " ++ toCliCommand mealBody
   toCliCommand cmd = "Example: " ++ show cmd
+
+instance ToCliCommand Lib1.MealBody where
+  toCliCommand (Lib1.SingleAdd food amount unit calories mealType) =
+    toCliCommand (Lib1.Add food amount unit calories mealType)
+  
+  toCliCommand (Lib1.CombineAdd first second) =
+    toCliCommand first ++ ", " ++ toCliCommand second 
 
 instance Eq Lib1.Command where
   (==) :: Lib1.Command -> Lib1.Command -> Bool
   Lib1.Dump Lib1.Examples == Lib1.Dump Lib1.Examples = True
-  -- Lib1.Display date1 == Lib1.Display date2 = date1 == date2 -- probably will need later
+  Lib1.Display date1 == Lib1.Display date2 = date1 == date2
+  Lib1.Add f1 a1 u1 c1 m1 == Lib1.Add f2 a2 u2 c2 m2 =
+    f1 == f2 && a1 == a2 && u1 == u2 && c1 == c2 && m1 == m2
+  Lib1.Remove f1 a1 u1 c1 m1 == Lib1.Remove f2 a2 u2 c2 m2 =
+    f1 == f2 && a1 == a2 && u1 == u2 && c1 == c2 && m1 == m2
+  Lib1.Total date1 == Lib1.Total date2 = date1 == date2
+  Lib1.Meal body1 == Lib1.Meal body2 = body1 == body2
   _ == _ = False -- everything else is not equal
 
-{- Also may need later
+instance Eq Lib1.Food where
+  (==) :: Lib1.Food -> Lib1.Food -> Bool
+  Lib1.Food food1 == Lib1.Food food2 = food1 == food2
+
+instance Eq Lib1.MealBody where
+  (==) :: Lib1.MealBody -> Lib1.MealBody -> Bool
+  Lib1.SingleAdd f1 a1 u1 c1 m1 == Lib1.SingleAdd f2 a2 u2 c2 m2 =
+    f1 == f2 && a1 == a2 && u1 == u2 && c1 == c2 && m1 == m2
+  Lib1.CombineAdd a1 b1 == Lib1.CombineAdd a2 b2 = 
+    a1 == a2 && b1 == b2
+  _ == _ = False
+
 instance Eq Lib1.Date where
   (==) :: Lib1.Date -> Lib1.Date -> Bool
   Lib1.Date y1 m1 d1 == Lib1.Date y2 m2 d2 = 
     y1 == y2 && m1 == m2 && d1 == d2    
--}
 
 instance ToCliCommand Lib1.Unit where
   toCliCommand Lib1.Grams = "Grams"
@@ -256,3 +315,19 @@ instance ToCliCommand Lib1.MealType where
   toCliCommand Lib1.Lunch = "lunch"
   toCliCommand Lib1.Dinner = "dinner"
   toCliCommand Lib1.Snack = "snack"
+
+instance Eq Lib1.Unit where
+  (==) :: Lib1.Unit -> Lib1.Unit -> Bool
+  Lib1.Grams == Lib1.Grams = True
+  Lib1.Kilograms == Lib1.Kilograms = True
+  Lib1.Milliliters == Lib1.Milliliters = True
+  Lib1.Liters == Lib1.Liters = True
+  _ == _ = False
+
+instance Eq Lib1.MealType where
+  (==) :: Lib1.MealType -> Lib1.MealType -> Bool
+  Lib1.Breakfast == Lib1.Breakfast = True
+  Lib1.Lunch == Lib1.Lunch = True
+  Lib1.Dinner == Lib1.Dinner = True
+  Lib1.Snack == Lib1.Snack = True
+  _ == _ = False

@@ -1,5 +1,5 @@
 module Lib1
-    ( examples, Command(..), Dumpable(..), Date(..), Unit(..), MealType(..), Food(..)
+    ( examples, Command(..), Dumpable(..), Date(..), Unit(..), MealType(..), Food(..), MealBody(..)
     ) where
 --import Lib1 (Command)
 
