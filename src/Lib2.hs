@@ -27,6 +27,16 @@ andThen p1 p2 input =
   case p1 input of
     Left err -> Left err
     Right (_, rest) -> p2 rest
+-- | The 'pmap' function allows us to transform the result produced by a parser without changing how that parser actually reads the input string.
+--
+-- A parser of type 'Parser a' returns either:
+--   'Left' with an error message if parsing fails, or
+--   'Right (v, r)' where 'v' is the parsed value and 'r' is the remaining input.
+pmap :: (a -> b) -> Parser a -> Parser b
+pmap f p input
+  = case p input of
+      Left e -> Left e
+      Right (v, r) -> Right (f v, r)
 
 and2 :: Parser a -> Parser b -> Parser (a, b)
 and2 p1 p2 input
@@ -66,31 +76,21 @@ and5 p1 p2 p3 p4 p5 input =
 
 -- ==================== OTHER HELPERS ====================
 
--- <unit> ::= "Grams" | "Kilograms" | "Mililiters" | "Liters"
+-- <unit> ::= "Grams" | "Kilograms" | "Milliliters" | "Liters"
 parseUnit :: Parser Lib1.Unit
-parseUnit input =
-  case parseKeyword "Grams" input of
-    Right (_, rest) -> Right (Lib1.Grams, rest)
-    Left _ -> case parseKeyword "Kilograms" input of
-      Right (_, rest) -> Right (Lib1.Kilograms, rest)
-      Left _ -> case parseKeyword "Milliliters" input of
-        Right (_, rest) -> Right (Lib1.Milliliters, rest)
-        Left _ -> case parseKeyword "Liters" input of
-          Right (_, rest) -> Right (Lib1.Liters, rest)
-          Left err -> Left err
+parseUnit
+  = (pmap (const Lib1.Grams) (parseKeyword "Grams")) `orElse`
+      (pmap (const Lib1.Kilograms) (parseKeyword "Kilograms")) `orElse`
+      (pmap (const Lib1.Milliliters) (parseKeyword "Milliliters")) `orElse`
+      (pmap (const Lib1.Liters) (parseKeyword "Liters"))
 
--- <meal_type> ::= "breakfast" | "lunch" | "dinner" | "snack"
+-- <meal_type> ::= "breakfast" | "lunch" | "dinner" | "snack"  
 parseMealType :: Parser Lib1.MealType
-parseMealType input =
-  case parseKeyword "breakfast" input of
-    Right (_, rest) -> Right (Lib1.Breakfast, rest)
-    Left _ -> case parseKeyword "lunch" input of
-      Right (_, rest) -> Right (Lib1.Lunch, rest)
-      Left _ -> case parseKeyword "dinner" input of
-        Right (_, rest) -> Right (Lib1.Dinner, rest)
-        Left _ -> case parseKeyword "snack" input of
-          Right (_, rest) -> Right (Lib1.Snack, rest)
-          Left err -> Left err
+parseMealType
+  = (pmap (const Lib1.Breakfast) (parseKeyword "breakfast")) `orElse` 
+      (pmap (const Lib1.Lunch) (parseKeyword "lunch")) `orElse` 
+      (pmap (const Lib1.Dinner) (parseKeyword "dinner")) `orElse` 
+      (pmap (const Lib1.Snack) (parseKeyword "snack"))
 
 -- <data> ::= <food> ", " <amount> <unit> ", " <calories> " "
 parseFoodData :: Parser (Lib1.Food, Int, Lib1.Unit, Int)
